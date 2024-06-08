@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Fragment } from "react";
 import Image from "next/image";
+import { Dialog, Transition } from "@headlessui/react";
 
 export default function Home() {
   const [billingData, setBillingData] = useState([
@@ -21,6 +22,19 @@ export default function Home() {
     { id: 2, date: "2023-02-01", amount: 300.0 },
   ]);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
+
+  const openModal = (invoice) => {
+    setSelectedInvoice(invoice);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedInvoice(null);
+  };
+
   const totalAmount = billingData.reduce((acc, item) => acc + item.amount, 0);
 
   return (
@@ -34,12 +48,12 @@ export default function Home() {
 
       <main className="mt-6 space-y-6">
         <section className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Billing Summary</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Billing Summary</h2>
           <table className="min-w-full bg-white">
             <thead>
               <tr>
-                <th className="py-2 px-4 border-b">Description</th>
-                <th className="py-2 px-4 border-b">Amount ($)</th>
+                <th className="py-2 px-4 border-b bg-gray-200">Description</th>
+                <th className="py-2 px-4 border-b bg-gray-200">Amount ($)</th>
               </tr>
             </thead>
             <tbody>
@@ -60,7 +74,7 @@ export default function Home() {
         </section>
 
         <section className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Payment Information</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Payment Information</h2>
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="font-semibold">Card Number:</span>
@@ -78,13 +92,13 @@ export default function Home() {
         </section>
 
         <section className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Previous Invoices</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Previous Invoices</h2>
           <table className="min-w-full bg-white">
             <thead>
               <tr>
-                <th className="py-2 px-4 border-b">Date</th>
-                <th className="py-2 px-4 border-b">Amount ($)</th>
-                <th className="py-2 px-4 border-b">Actions</th>
+                <th className="py-2 px-4 border-b bg-gray-200">Date</th>
+                <th className="py-2 px-4 border-b bg-gray-200">Amount ($)</th>
+                <th className="py-2 px-4 border-b bg-gray-200">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -93,7 +107,7 @@ export default function Home() {
                   <td className="py-2 px-4 border-b">{invoice.date}</td>
                   <td className="py-2 px-4 border-b text-right">{invoice.amount.toFixed(2)}</td>
                   <td className="py-2 px-4 border-b text-right">
-                    <button className="text-blue-500 hover:underline">View Details</button>
+                    <button className="text-blue-500 hover:underline" onClick={() => openModal(invoice)}>View Details</button>
                   </td>
                 </tr>
               ))}
@@ -101,6 +115,64 @@ export default function Home() {
           </table>
         </section>
       </main>
+
+      <Transition appear show={isModalOpen} as={Fragment}>
+        <Dialog as="div" className="relative z-10" onClose={closeModal}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-gray-900"
+                  >
+                    Invoice Details
+                  </Dialog.Title>
+                  <div className="mt-2">
+                    {selectedInvoice && (
+                      <div>
+                        <p><strong>Date:</strong> {selectedInvoice.date}</p>
+                        <p><strong>Amount:</strong> ${selectedInvoice.amount.toFixed(2)}</p>
+                        {/* Add more details as needed */}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                      onClick={closeModal}
+                    >
+                      Close
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
     </div>
   );
 }
