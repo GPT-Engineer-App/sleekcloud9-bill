@@ -1,8 +1,49 @@
 "use client";
 
-import { useState, Fragment } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import { Dialog, Transition } from "@headlessui/react";
+
+const Modal = ({ isOpen, onClose, invoice }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-10 overflow-y-auto">
+      <div className="fixed inset-0 w-full h-full bg-black opacity-50" onClick={onClose}></div>
+      <div className="flex items-center min-h-screen px-4 py-8">
+        <div className="relative w-full max-w-lg p-4 mx-auto bg-white rounded-md shadow-lg">
+          <div className="flex justify-end">
+            <button className="text-gray-500 hover:text-gray-700" onClick={onClose}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div className="mt-3 text-center">
+            <h3 className="text-lg font-medium text-gray-900">Invoice Details</h3>
+            <div className="mt-2">
+              {invoice && (
+                <div>
+                  <p><strong>Date:</strong> {invoice.date}</p>
+                  <p><strong>Amount:</strong> ${invoice.amount.toFixed(2)}</p>
+                  {/* Add more details as needed */}
+                </div>
+              )}
+            </div>
+            <div className="mt-4">
+              <button
+                type="button"
+                className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                onClick={onClose}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default function Home() {
   const [billingData, setBillingData] = useState([
@@ -42,13 +83,18 @@ export default function Home() {
       <header className="flex items-center justify-between bg-white p-4 shadow-md">
         <div className="flex items-center space-x-2">
           <div className="text-blue-500 text-3xl">☁️</div>
-          <h1 className="text-2xl font-bold text-gray-800">Cloud9 Billing</h1>
+          <h1 className="text-3xl font-bold text-gray-800">Cloud9 Billing</h1>
         </div>
       </header>
 
       <main className="mt-6 space-y-6">
         <section className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Billing Summary</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Billing Summary
+          </h2>
           <table className="min-w-full bg-white">
             <thead>
               <tr>
@@ -58,7 +104,7 @@ export default function Home() {
             </thead>
             <tbody>
               {billingData.map((item) => (
-                <tr key={item.id}>
+                <tr key={item.id} className="hover:bg-gray-100">
                   <td className="py-2 px-4 border-b">{item.description}</td>
                   <td className="py-2 px-4 border-b text-right">{item.amount.toFixed(2)}</td>
                 </tr>
@@ -103,7 +149,7 @@ export default function Home() {
             </thead>
             <tbody>
               {invoices.map((invoice) => (
-                <tr key={invoice.id}>
+                <tr key={invoice.id} className="hover:bg-gray-100">
                   <td className="py-2 px-4 border-b">{invoice.date}</td>
                   <td className="py-2 px-4 border-b text-right">{invoice.amount.toFixed(2)}</td>
                   <td className="py-2 px-4 border-b text-right">
@@ -116,63 +162,7 @@ export default function Home() {
         </section>
       </main>
 
-      <Transition appear show={isModalOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={closeModal}>
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-black bg-opacity-25" />
-          </Transition.Child>
-
-          <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                  <Dialog.Title
-                    as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900"
-                  >
-                    Invoice Details
-                  </Dialog.Title>
-                  <div className="mt-2">
-                    {selectedInvoice && (
-                      <div>
-                        <p><strong>Date:</strong> {selectedInvoice.date}</p>
-                        <p><strong>Amount:</strong> ${selectedInvoice.amount.toFixed(2)}</p>
-                        {/* Add more details as needed */}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="mt-4">
-                    <button
-                      type="button"
-                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                      onClick={closeModal}
-                    >
-                      Close
-                    </button>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
-          </div>
-        </Dialog>
-      </Transition>
+      <Modal isOpen={isModalOpen} onClose={closeModal} invoice={selectedInvoice} />
     </div>
   );
 }
