@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { FaCloud, FaDollarSign, FaFileInvoiceDollar } from "react-icons/fa";
+
 
 export default function Home() {
   const [billingData, setBillingData] = useState([
@@ -17,7 +17,7 @@ export default function Home() {
     <div className="min-h-screen bg-gray-100 p-6">
       <header className="flex items-center justify-between bg-white p-4 shadow-md">
         <div className="flex items-center space-x-2">
-          <FaCloud className="text-blue-500" size={32} />
+          <div className="text-blue-500 text-3xl">☁️</div>
           <h1 className="text-2xl font-bold text-gray-800">Cloud9 Billing</h1>
         </div>
       </header>
